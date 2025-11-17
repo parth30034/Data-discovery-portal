@@ -19,14 +19,78 @@ const ENVIRONMENT_OPTIONS = [
 ];
 
 const DATABASE_OPTIONS = [
+  // Relational Databases
   { id: 'postgresql', label: 'PostgreSQL' },
   { id: 'mysql', label: 'MySQL' },
-  { id: 'oracle', label: 'Oracle' },
-  { id: 'sqlserver', label: 'SQL Server' },
+  { id: 'mariadb', label: 'MariaDB' },
+  { id: 'oracle', label: 'Oracle Database' },
+  { id: 'sqlserver', label: 'Microsoft SQL Server' },
+  { id: 'sqlite', label: 'SQLite' },
+  { id: 'db2', label: 'IBM DB2' },
+  { id: 'snowflake', label: 'Snowflake' },
+  { id: 'teradata', label: 'Teradata' },
+  { id: 'sap-hana', label: 'SAP HANA' },
+  { id: 'cockroachdb', label: 'CockroachDB' },
+  
+  // NoSQL Document Databases
   { id: 'mongodb', label: 'MongoDB' },
-  { id: 'dynamodb', label: 'DynamoDB' },
-  { id: 'cassandra', label: 'Cassandra' },
+  { id: 'couchdb', label: 'Apache CouchDB' },
+  { id: 'ravendb', label: 'RavenDB' },
+  { id: 'couchbase', label: 'Couchbase' },
+  { id: 'cosmosdb', label: 'Azure Cosmos DB' },
+  { id: 'firestore', label: 'Google Cloud Firestore' },
+  { id: 'documentdb', label: 'Amazon DocumentDB' },
+  
+  // NoSQL Key-Value Stores
   { id: 'redis', label: 'Redis' },
+  { id: 'dynamodb', label: 'Amazon DynamoDB' },
+  { id: 'riak', label: 'Riak' },
+  { id: 'hazelcast', label: 'Hazelcast IMDG' },
+  { id: 'memcached', label: 'Memcached' },
+  { id: 'etcd', label: 'etcd' },
+  
+  // NoSQL Column Family / Wide Column
+  { id: 'cassandra', label: 'Apache Cassandra' },
+  { id: 'hbase', label: 'Apache HBase' },
+  { id: 'accumulo', label: 'Apache Accumulo' },
+  { id: 'scylladb', label: 'ScyllaDB' },
+  
+  // Graph Databases
+  { id: 'neo4j', label: 'Neo4j' },
+  { id: 'arangodb', label: 'ArangoDB' },
+  { id: 'amazon-neptune', label: 'Amazon Neptune' },
+  { id: 'titan', label: 'Apache TinkerPop / Titan' },
+  { id: 'orientdb', label: 'OrientDB' },
+  { id: 'janusgraph', label: 'JanusGraph' },
+  
+  // Time-Series Databases
+  { id: 'influxdb', label: 'InfluxDB' },
+  { id: 'timescaledb', label: 'TimescaleDB' },
+  { id: 'prometheus', label: 'Prometheus' },
+  { id: 'opentsdb', label: 'OpenTSDB' },
+  { id: 'questdb', label: 'QuestDB' },
+  { id: 'aws-timestream', label: 'AWS Timestream' },
+  
+  // Search & Analytics Engines
+  { id: 'elasticsearch', label: 'Elasticsearch' },
+  { id: 'opensearch', label: 'OpenSearch' },
+  { id: 'solr', label: 'Apache Solr' },
+  { id: 'splunk', label: 'Splunk' },
+  { id: 'algolia', label: 'Algolia' },
+  
+  // Data Warehouses
+  { id: 'redshift', label: 'Amazon Redshift' },
+  { id: 'bigquery', label: 'Google BigQuery' },
+  { id: 'synapse', label: 'Azure Synapse Analytics' },
+  { id: 'databricks', label: 'Databricks' },
+  { id: 'clickhouse', label: 'ClickHouse' },
+  { id: 'druid', label: 'Apache Druid' },
+  
+  // Other Specialized Databases
+  { id: 'spark-sql', label: 'Apache Spark SQL' },
+  { id: 'presto', label: 'Presto / Trino' },
+  { id: 'greenplum', label: 'Greenplum' },
+  { id: 'vertica', label: 'Vertica' },
 ];
 
 export function EnvironmentStep({ formData, updateFormData }: EnvironmentStepProps) {
