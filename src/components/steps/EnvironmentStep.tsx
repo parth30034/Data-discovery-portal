@@ -1,5 +1,6 @@
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
+import { MultiSelect } from '../ui/multi-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Input } from '../ui/input';
 import type { DiscoveryFormData } from '../types';
@@ -34,13 +35,6 @@ export function EnvironmentStep({ formData, updateFormData }: EnvironmentStepPro
       ? formData.environments.filter((e) => e !== envId)
       : [...formData.environments, envId];
     updateFormData({ environments: updated });
-  };
-
-  const toggleDatabase = (dbId: string) => {
-    const updated = formData.databases.includes(dbId)
-      ? formData.databases.filter((d) => d !== dbId)
-      : [...formData.databases, dbId];
-    updateFormData({ databases: updated });
   };
 
   return (
@@ -104,22 +98,15 @@ export function EnvironmentStep({ formData, updateFormData }: EnvironmentStepPro
         </div>
       </div>
 
-      <div className="space-y-3">
-        <Label>Database Technologies *</Label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {DATABASE_OPTIONS.map((db) => (
-            <div key={db.id} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
-              <Checkbox
-                id={db.id}
-                checked={formData.databases.includes(db.id)}
-                onCheckedChange={() => toggleDatabase(db.id)}
-              />
-              <label htmlFor={db.id} className="flex-1 cursor-pointer text-sm">
-                {db.label}
-              </label>
-            </div>
-          ))}
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="databases">Database Technologies *</Label>
+        <MultiSelect
+          id="databases"
+          options={DATABASE_OPTIONS}
+          selected={formData.databases}
+          onChange={(selected) => updateFormData({ databases: selected })}
+          placeholder="Select database technologies..."
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
