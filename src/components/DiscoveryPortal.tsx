@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
-import { Database, ArrowRight, ArrowLeft, Check, LogOut } from 'lucide-react';
+import { Alert, AlertDescription } from './ui/alert';
+import { Database, ArrowRight, ArrowLeft, Check, LogOut, Loader2, Cloud, AlertCircle } from 'lucide-react';
 import { BasicInfoStep } from './steps/BasicInfoStep';
 import { EnvironmentStep } from './steps/EnvironmentStep';
 import { LocationScopeStep } from './steps/LocationScopeStep';
 import { ConnectionTargetsStep } from './steps/ConnectionTargetsStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { DiscoveryReport } from './DiscoveryReport';
+import { useAdlsMetadata } from '../hooks/useAdlsMetadata';
 import type { DiscoveryFormData } from './types';
 
 const STEPS = [
@@ -27,6 +29,11 @@ interface DiscoveryPortalProps {
 export function DiscoveryPortal({ currentUser, onLogout }: DiscoveryPortalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [useAdlsData, setUseAdlsData] = useState(false);
+  
+  // ADLS metadata hook
+  const { data: adlsData, loading: adlsLoading, error: adlsError, refetch: refetchAdls } = useAdlsMetadata();
+  
   const [formData, setFormData] = useState<DiscoveryFormData>({
     // Basic Info
     projectName: '',
@@ -71,12 +78,31 @@ export function DiscoveryPortal({ currentUser, onLogout }: DiscoveryPortalProps)
     }
   };
 
-  const handleSubmit = () => {
-    // Simulate discovery scan and generate inventory summary
-    const inventorySummary = generateMockInventory(formData);
+  const handleSubmit = async () => {
+    let inventorySummary;
+    
+    if (useAdlsData && adlsData) {
+      // Use data fetched from ADLS
+      inventorySummary = adlsData;
+      console.log('Using ADLS data:', inventorySummary);
+    } else if (useAdlsData && !adlsData && !adlsLoading && !adlsError) {
+      // Try to fetch from ADLS if not already fetched
+      await refetchAdls();
+      if (adlsData) {
+        inventorySummary = adlsData;
+      } else {
+        // Fallback to mock if ADLS fetch fails
+        inventorySummary = generateMockInventory(formData);
+        console.warn('ADLS fetch failed, using mock data');
+      }
+    } else {
+      // Use mock data (default behavior)
+      inventorySummary = generateMockInventory(formData);
+      console.log('Using mock data:', inventorySummary);
+    }
+    
     const updatedFormData = { ...formData, inventorySummary };
     setFormData(updatedFormData);
-    console.log('Form submitted:', updatedFormData);
     setIsSubmitted(true);
   };
 
@@ -458,7 +484,84 @@ export function DiscoveryPortal({ currentUser, onLogout }: DiscoveryPortalProps)
             <ConnectionTargetsStep formData={formData} updateFormData={updateFormData} />
           )}
           {currentStep === 5 && (
-            <ReviewStep formData={formData} />
+            <>
+              <ReviewStep formData={formData} />
+              
+              {/* ADLS Data Source Toggle */}
+              <div className="mt-6 p-4 border rounded-lg bg-gray-50">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Cloud className="w-5 h-5 text-blue-600" />
+                    <label className="text-sm font-medium">Data Source</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm ${!useAdlsData ? 'font-medium' : 'text-gray-500'}`}>
+                      Mock Data
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={useAdlsData}
+                      onChange={(e) => setUseAdlsData(e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                    <span className={`text-sm ${useAdlsData ? 'font-medium' : 'text-gray-500'}`}>
+                      ADLS Gen2
+                    </span>
+                  </div>
+                </div>
+                
+                {useAdlsData && (
+                  <div className="mt-3 space-y-2">
+                    {adlsLoading && (
+                      <Alert>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <AlertDescription>
+                          Fetching metadata from ADLS Gen2...
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
+                    {adlsError && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="w-4 h-4" />
+                        <AlertDescription>
+                          Error fetching from ADLS: {adlsError.message}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => refetchAdls()}
+                          >
+                            Retry
+                          </Button>
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
+                    {adlsData && !adlsLoading && (
+                      <Alert className="bg-green-50 border-green-200">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <AlertDescription className="text-green-800">
+                          Successfully loaded {adlsData.totalObjects} objects from ADLS Gen2
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    
+                    {!adlsData && !adlsLoading && !adlsError && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => refetchAdls()}
+                        className="w-full"
+                      >
+                        <Cloud className="w-4 h-4 mr-2" />
+                        Fetch from ADLS Gen2
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
           )}
 
           <div className="flex justify-between mt-8 pt-6 border-t">
