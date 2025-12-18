@@ -9,7 +9,7 @@ You're getting a CORS error when trying to write from the browser, even though P
 
 ### Check your `.env` file:
 ```env
-VITE_ADLS_SAS_URL=https://rsidatadiscovery.blob.core.windows.net/?sv=...
+VITE_ADLS_SAS_URL=https://projectname.blob.core.windows.net/?sv=...
 VITE_ADLS_CONTAINER_NAME=customcontainer
 ```
 
@@ -104,7 +104,7 @@ Then frontend calls your backend API instead of Azure Storage directly.
 
 When working correctly, you should see:
 ```
-Writing to Azure Storage URL: https://rsidatadiscovery.blob.core.windows.net/customcontainer/inputs/project_123/scan_request.json?sv=...&sig=***
+Writing to Azure Storage URL: https://rsidatadiscovery.blob.core.windows.net...&sig=***
 Container name: customcontainer
 Is Blob Storage: true
 ```
@@ -116,4 +116,5 @@ Is Blob Storage: true
 3. **Verify SAS token** - make sure it has Write (`w`) and Create (`c`) permissions
 4. **Try from different browser** - rule out browser-specific issues
 5. **Check if container exists** - verify `customcontainer` exists in your storage account
+
 
