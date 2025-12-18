@@ -9,13 +9,33 @@ This guide explains how to configure and use the ADLS Gen2 JSON fetch functional
    - Generate a Shared Access Signature (SAS) with **Read** and **List** permissions
    - Copy the full SAS URL (including query parameters)
 
-2. **Configure the SAS URL**
+2. **Configure the SAS URL and Metadata Path**
 
    **Option A: Environment Variable (Recommended)**
    
    Create a `.env` file in the project root:
    ```env
-   VITE_ADLS_SAS_URL=https://yourstorageaccount.dfs.core.windows.net/container/path/metadata.json?sv=2021-06-08&ss=bfqt&srt=sco&sp=r&se=2025-01-20T10:00:00Z&sig=...
+   # ADLS SAS URL with read permissions
+   VITE_ADLS_SAS_URL=https://yourstorageaccount.dfs.core.windows.net/container?sv=2021-06-08&ss=bfqt&srt=sco&sp=r&se=2025-01-20T10:00:00Z&sig=...
+   
+   # Container/Share name (optional, defaults to 'customcontainer')
+   VITE_ADLS_CONTAINER_NAME=customcontainer
+   
+   # Metadata file path in ADLS container (optional, defaults to 'metadata.json')
+   # This is the path to the JSON file you want to fetch when ADLS Gen2 checkbox is ticked
+   # Examples:
+   #   - metadata.json (default, root of container)
+   #   - outputs/scan_results/scan_result.json
+   #   - outputs/project_123/scan_result.json
+   VITE_ADLS_METADATA_PATH=metadata.json
+   
+   # Scan request input file path in ADLS container (optional, defaults to 'inputs/scan_request.json')
+   # This is the path where scan requests are written when user submits the form
+   # The file is overwritten on each submission (single file, not project-specific)
+   # Examples:
+   #   - inputs/scan_request.json (default)
+   #   - inputs/my_custom_path/scan_request.json
+   VITE_ADLS_SCAN_REQUEST_PATH=inputs/scan_request.json
    ```
 
    **Option B: Direct Configuration**
@@ -23,6 +43,7 @@ This guide explains how to configure and use the ADLS Gen2 JSON fetch functional
    Edit `src/config/adls.ts` and replace the empty string:
    ```typescript
    export const ADLS_SAS_URL = 'YOUR_SAS_URL_HERE';
+   export const ADLS_METADATA_PATH = 'outputs/scan_results/scan_result.json';
    ```
 
 3. **Ensure CORS is configured**
@@ -102,6 +123,12 @@ This guide explains how to configure and use the ADLS Gen2 JSON fetch functional
 - Ensure `VITE_ADLS_SAS_URL` is set in `.env` file
 - Or update `ADLS_SAS_URL` in `src/config/adls.ts`
 - Restart the dev server after changing `.env` file
+
+**File path not found or incorrect**
+- Verify `VITE_ADLS_METADATA_PATH` points to the correct file in your ADLS container
+- Default path is `metadata.json` if not specified
+- Ensure the file exists at the specified path in your container
+- Path should be relative to the container root (e.g., `outputs/scan_result.json`)
 
 **Data not displaying correctly**
 - Verify JSON structure matches `InventorySummary` interface
